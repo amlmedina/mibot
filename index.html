@@ -1025,17 +1025,36 @@ async function doLogin () {
 
   if (!email) { showError('Por favor ingresa tu email.'); return }
   if (!key || key.length !== 8) { showError('La clave debe tener exactamente 8 caracteres.'); return }
+  if (!/^[0-9a-f]{8}$/.test(key)) { showError('La clave solo puede contener letras a-f y números.'); return }
   if (!accepted) { showError('Debes aceptar los Términos y Condiciones para continuar.'); return }
 
   btn.disabled = true
-  btn.textContent = 'Redirigiendo...'
+  btn.textContent = 'Verificando...'
 
-  sessionStorage.setItem('mibot_key', key)
-  sessionStorage.setItem('mibot_email', email)
+  try {
+    // Login seguro: clave va en el body, nunca en la URL
+    const res = await fetch(`${BACKEND}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',  // necesario para cookies cross-origin
+      body: JSON.stringify({ key })
+    })
 
-  setTimeout(() => {
-    window.location.href = `${BACKEND}/${key}`
-  }, 400)
+    const data = await res.json()
+
+    if (data.success) {
+      btn.textContent = 'Redirigiendo...'
+      window.location.href = `${BACKEND}/dashboard`
+    } else {
+      showError('Clave incorrecta o inactiva. Contacta al administrador.')
+      btn.disabled = false
+      btn.textContent = 'Acceder al panel →'
+    }
+  } catch (err) {
+    showError('Error de conexión. Intenta de nuevo.')
+    btn.disabled = false
+    btn.textContent = 'Acceder al panel →'
+  }
 }
 
 function showError (msg) {
