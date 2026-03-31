@@ -778,38 +778,55 @@ footer a:hover { text-decoration: underline; }
   <div class="modal">
     <button class="modal-close" onclick="closeLogin()">✕</button>
     <div class="modal-logo">MiBot WA</div>
-    <div class="modal-subtitle">Ingresa con tu clave de acceso</div>
 
-    <div id="loginError" class="login-error">
-      Clave incorrecta. Contacta al administrador si no tienes acceso.
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;margin-bottom:24px;background:#f0f2f5;padding:4px;border-radius:10px">
+      <button id="tab-login-btn" onclick="switchTab('login')" style="flex:1;padding:8px;border:none;background:white;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;color:#1a1a2e;box-shadow:0 1px 4px rgba(0,0,0,.08);font-family:inherit">Iniciar sesión</button>
+      <button id="tab-reg-btn" onclick="switchTab('register')" style="flex:1;padding:8px;border:none;background:transparent;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;color:#666;font-family:inherit">Registrarse</button>
     </div>
 
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="email"/>
+    <div id="authError" class="login-error"></div>
+    <div id="authSuccess" style="background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;padding:10px 14px;font-size:13px;color:#25d366;margin-bottom:16px;display:none"></div>
+
+    <!-- Login form -->
+    <div id="form-login">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="loginPassword" placeholder="Tu contraseña" onkeypress="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="btn-login" onclick="doLogin()">Iniciar sesión →</button>
+      <div class="login-note">¿No tienes cuenta? <a href="#" onclick="switchTab('register')" style="color:var(--green)">Regístrate gratis</a></div>
     </div>
 
-    <div class="form-group">
-      <label>Clave de acceso</label>
-      <input type="password" id="loginKey" placeholder="Clave de 8 caracteres"
-        maxlength="8" autocomplete="current-password"
-        onkeypress="if(event.key==='Enter')doLogin()"/>
+    <!-- Register form -->
+    <div id="form-register" style="display:none">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="regEmail" placeholder="tu@email.com" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres"/>
+      </div>
+      <div class="form-group">
+        <label>Confirmar contraseña</label>
+        <input type="password" id="regPassword2" placeholder="Repite tu contraseña" onkeypress="if(event.key==='Enter')doRegister()"/>
+      </div>
+      <div class="terms-check">
+        <input type="checkbox" id="termsCheck"/>
+        <label for="termsCheck">
+          He leído y acepto los <a href="#" onclick="openTerms()">Términos y Condiciones</a>.
+          Entiendo que es un servicio beta bajo mi propio riesgo.
+        </label>
+      </div>
+      <button class="btn-login" onclick="doRegister()">Crear cuenta →</button>
+      <div class="login-note">¿Ya tienes cuenta? <a href="#" onclick="switchTab('login')" style="color:var(--green)">Inicia sesión</a></div>
     </div>
 
-    <div class="terms-check">
-      <input type="checkbox" id="termsCheck"/>
-      <label for="termsCheck">
-        He leído y acepto los <a href="#" onclick="openTerms()">Términos y Condiciones</a>.
-        Entiendo que este es un servicio beta bajo mi propio riesgo y que mi cuenta de WhatsApp podría ser suspendida por Meta.
-      </label>
-    </div>
-
-    <button class="btn-login" id="loginBtn" onclick="doLogin()">Acceder al panel →</button>
-
-    <div class="login-note">
-      ¿No tienes clave? El acceso es por invitación durante la beta.<br>
-      Escríbenos a <a href="mailto:contacto@mibot.app" style="color:var(--green)">contacto@mibot.app</a>
-    </div>
   </div>
 </div>
 
@@ -817,259 +834,145 @@ footer a:hover { text-decoration: underline; }
 <div class="terms-page" id="termsPage">
   <div class="terms-container">
     <button class="terms-back" onclick="closeTerms()">← Volver</button>
-
     <div class="terms-header">
       <h1>Términos y Condiciones</h1>
       <p>Última actualización: 31 de marzo de 2026 · MiBot WhatsApp Automation</p>
     </div>
-
     <div class="terms-lang-toggle">
       <button class="lang-btn active" onclick="setLang('es', this)">Español</button>
       <button class="lang-btn" onclick="setLang('en', this)">English</button>
     </div>
-
-    <!-- ESPAÑOL -->
     <div class="terms-content active" id="terms-es">
-
-      <div class="terms-warning-box">
-        <p>⚠️ <strong>ADVERTENCIA IMPORTANTE:</strong> Este servicio NO está afiliado con WhatsApp Inc. ni con Meta Platforms Inc. El uso de automatizaciones puede violar los Términos de Servicio de WhatsApp. El usuario asume toda la responsabilidad y los riesgos derivados del uso de este servicio.</p>
-      </div>
-
-      <div class="terms-section">
-        <h2>1. Naturaleza del Servicio</h2>
-        <p>MiBot es un servicio de automatización de mensajería que permite programar y enviar mensajes a través de WhatsApp Web. MiBot opera de forma independiente y no tiene ninguna relación comercial, técnica ni legal con WhatsApp Inc., Meta Platforms Inc. o cualquiera de sus subsidiarias.</p>
-        <div class="terms-info-box">
-          <p>🎁 <strong>Servicio Beta Gratuito:</strong> MiBot está actualmente en fase beta y es completamente gratuito. A partir del <strong>6 de mayo de 2026</strong>, el servicio comenzará a tener un costo mensual. Los usuarios registrados durante la beta podrán recibir condiciones especiales. El costo y las condiciones serán comunicados con anticipación.</p>
-        </div>
-      </div>
-
-      <div class="terms-section">
-        <h2>2. Riesgos y Responsabilidad del Usuario</h2>
-        <p>Al usar MiBot, el usuario reconoce y acepta expresamente que:</p>
-        <ul>
-          <li>El uso de herramientas de automatización en WhatsApp puede violar los Términos de Servicio de WhatsApp/Meta y resultar en la <strong>suspensión temporal o permanente</strong> de su número de teléfono.</li>
-          <li>MiBot no se hace responsable por ningún baneo, suspensión, bloqueo o pérdida de cuenta de WhatsApp derivada del uso de este servicio.</li>
-          <li>El usuario es el único responsable del contenido de los mensajes enviados a través de MiBot.</li>
-          <li>El usuario debe contar con el consentimiento de los destinatarios para enviarles mensajes automatizados, conforme a las leyes de privacidad aplicables en su jurisdicción.</li>
-          <li>MiBot no almacena el contenido de los mensajes de forma permanente. Los datos se eliminan automáticamente tras 30 días.</li>
-        </ul>
-      </div>
-
-      <div class="terms-section">
-        <h2>3. Uso Prohibido</h2>
-        <p>Queda estrictamente prohibido usar MiBot para:</p>
-        <ul>
-          <li>Enviar mensajes no solicitados (spam) a gran escala.</li>
-          <li>Distribuir contenido ilegal, ofensivo, fraudulento o que incite al odio.</li>
-          <li>Realizar campañas de marketing masivo sin el consentimiento expreso de los destinatarios.</li>
-          <li>Actividades que violen las leyes locales, nacionales o internacionales aplicables.</li>
-          <li>Acosar, amenazar o perjudicar a terceros.</li>
-        </ul>
-        <div class="terms-warning-box">
-          <p>⛔ El incumplimiento de estas prohibiciones resultará en la <strong>cancelación inmediata y permanente</strong> del acceso al servicio, sin previo aviso y sin derecho a reembolso.</p>
-        </div>
-      </div>
-
-      <div class="terms-section">
-        <h2>4. Exención de Responsabilidad</h2>
-        <p>MiBot se proporciona "tal cual" (as-is) y "según disponibilidad". En la máxima medida permitida por la ley aplicable:</p>
-        <ul>
-          <li>MiBot no garantiza la disponibilidad continua, ininterrumpida o libre de errores del servicio.</li>
-          <li>MiBot no será responsable por daños directos, indirectos, incidentales, especiales, consecuentes o punitivos, incluyendo pérdida de datos, ingresos, negocios o reputación.</li>
-          <li>MiBot no garantiza que los mensajes sean entregados exitosamente, ya que la entrega depende de factores externos fuera de nuestro control (incluyendo las políticas de WhatsApp).</li>
-          <li>MiBot se reserva el derecho de suspender o cancelar el servicio en cualquier momento y sin previo aviso.</li>
-        </ul>
-      </div>
-
-      <div class="terms-section">
-        <h2>5. Privacidad y Datos</h2>
-        <ul>
-          <li>MiBot no vende ni comparte datos de usuarios con terceros.</li>
-          <li>Las credenciales de sesión de WhatsApp se almacenan de forma encriptada únicamente para mantener la conexión activa.</li>
-          <li>Los mensajes programados se eliminan automáticamente tras 30 días o al ser enviados.</li>
-          <li>El usuario puede solicitar la eliminación de todos sus datos contactando al administrador.</li>
-        </ul>
-      </div>
-
-      <div class="terms-section">
-        <h2>6. Modificaciones al Servicio</h2>
-        <p>MiBot se reserva el derecho de modificar, suspender o descontinuar cualquier aspecto del servicio en cualquier momento. También podemos modificar estos términos y condiciones. El uso continuado del servicio tras la publicación de cambios constituye la aceptación de los mismos.</p>
-      </div>
-
-      <div class="terms-section">
-        <h2>7. Jurisdicción</h2>
-        <p>Estos términos se rigen por las leyes de los Estados Unidos Mexicanos. Cualquier disputa se someterá a la jurisdicción de los tribunales competentes de la Ciudad de México, México.</p>
-      </div>
-
-      <div class="terms-section">
-        <h2>8. Contacto</h2>
-        <p>Para preguntas sobre estos términos, escríbenos a: <a href="mailto:contacto@mibot.app" style="color:var(--green)">contacto@mibot.app</a></p>
-      </div>
-
-      <div class="terms-info-box">
-        <p>✅ Al usar MiBot, confirmas que has leído, entendido y aceptado en su totalidad estos Términos y Condiciones, incluyendo todos los riesgos descritos.</p>
-      </div>
+      <div class="terms-warning-box"><p>⚠️ <strong>ADVERTENCIA:</strong> Este servicio NO está afiliado con WhatsApp Inc. ni con Meta Platforms Inc. El uso de automatizaciones puede violar los Términos de Servicio de WhatsApp. El usuario asume toda la responsabilidad.</p></div>
+      <div class="terms-section"><h2>1. Naturaleza del Servicio</h2><p>MiBot es un servicio de automatización de mensajería independiente, sin relación con WhatsApp Inc. o Meta Platforms Inc.</p><div class="terms-info-box"><p>🎁 <strong>Beta Gratuita:</strong> Gratuito hasta el <strong>6 de mayo de 2026</strong>. Después tendrá costo mensual.</p></div></div>
+      <div class="terms-section"><h2>2. Riesgos y Responsabilidad</h2><ul><li>El uso puede resultar en <strong>suspensión temporal o permanente</strong> de tu número de WhatsApp.</li><li>MiBot no se responsabiliza por banes, suspensiones o pérdida de cuenta.</li><li>El usuario es responsable del contenido de los mensajes enviados.</li><li>Se requiere consentimiento de los destinatarios conforme a leyes de privacidad aplicables.</li></ul></div>
+      <div class="terms-section"><h2>3. Uso Prohibido</h2><ul><li>Spam o mensajes no solicitados a escala.</li><li>Contenido ilegal, ofensivo o fraudulento.</li><li>Marketing masivo sin consentimiento expreso.</li><li>Actividades que violen leyes locales o internacionales.</li></ul><div class="terms-warning-box"><p>⛔ El incumplimiento resulta en <strong>cancelación inmediata</strong> del acceso.</p></div></div>
+      <div class="terms-section"><h2>4. Exención de Responsabilidad</h2><p>MiBot se proporciona "tal cual". No garantizamos disponibilidad continua ni entrega exitosa de mensajes. No somos responsables por daños directos, indirectos o consecuentes.</p></div>
+      <div class="terms-section"><h2>5. Privacidad</h2><ul><li>No vendemos datos de usuarios.</li><li>Los mensajes programados se eliminan tras 30 días.</li><li>Las contraseñas se almacenan con hash, nunca en texto plano.</li></ul></div>
+      <div class="terms-section"><h2>6. Jurisdicción</h2><p>Estos términos se rigen por las leyes de los Estados Unidos Mexicanos. Disputas ante tribunales de la Ciudad de México.</p></div>
+      <div class="terms-info-box"><p>✅ Al registrarte, confirmas haber leído y aceptado estos Términos en su totalidad.</p></div>
     </div>
-
-    <!-- ENGLISH -->
     <div class="terms-content" id="terms-en">
-
-      <div class="terms-warning-box">
-        <p>⚠️ <strong>IMPORTANT WARNING:</strong> This service is NOT affiliated with WhatsApp Inc. or Meta Platforms Inc. The use of automation tools may violate WhatsApp's Terms of Service. The user assumes all responsibility and risks arising from the use of this service.</p>
-      </div>
-
-      <div class="terms-section">
-        <h2>1. Nature of Service</h2>
-        <p>MiBot is a messaging automation service that allows scheduling and sending messages through WhatsApp Web. MiBot operates independently and has no commercial, technical, or legal relationship with WhatsApp Inc., Meta Platforms Inc., or any of their subsidiaries.</p>
-        <div class="terms-info-box">
-          <p>🎁 <strong>Free Beta Service:</strong> MiBot is currently in beta and is completely free. Starting <strong>May 6, 2026</strong>, the service will have a monthly cost. Beta users may receive special conditions. Pricing and terms will be communicated in advance.</p>
-        </div>
-      </div>
-
-      <div class="terms-section">
-        <h2>2. User Risks and Responsibility</h2>
-        <p>By using MiBot, the user expressly acknowledges and accepts that:</p>
-        <ul>
-          <li>Using automation tools on WhatsApp may violate WhatsApp/Meta's Terms of Service and result in the <strong>temporary or permanent suspension</strong> of their phone number.</li>
-          <li>MiBot is not responsible for any ban, suspension, block, or loss of WhatsApp account resulting from the use of this service.</li>
-          <li>The user is solely responsible for the content of messages sent through MiBot.</li>
-          <li>The user must obtain consent from recipients to send them automated messages, in accordance with applicable privacy laws in their jurisdiction.</li>
-          <li>MiBot does not permanently store message content. Data is automatically deleted after 30 days.</li>
-        </ul>
-      </div>
-
-      <div class="terms-section">
-        <h2>3. Prohibited Use</h2>
-        <p>It is strictly prohibited to use MiBot to:</p>
-        <ul>
-          <li>Send unsolicited messages (spam) at scale.</li>
-          <li>Distribute illegal, offensive, fraudulent, or hate-inciting content.</li>
-          <li>Conduct mass marketing campaigns without the express consent of recipients.</li>
-          <li>Engage in activities that violate applicable local, national, or international laws.</li>
-          <li>Harass, threaten, or harm third parties.</li>
-        </ul>
-        <div class="terms-warning-box">
-          <p>⛔ Violation of these prohibitions will result in <strong>immediate and permanent cancellation</strong> of service access, without prior notice and without right to refund.</p>
-        </div>
-      </div>
-
-      <div class="terms-section">
-        <h2>4. Disclaimer of Liability</h2>
-        <p>MiBot is provided "as-is" and "as-available". To the maximum extent permitted by applicable law:</p>
-        <ul>
-          <li>MiBot does not guarantee continuous, uninterrupted, or error-free service availability.</li>
-          <li>MiBot shall not be liable for any direct, indirect, incidental, special, consequential, or punitive damages, including loss of data, revenue, business, or reputation.</li>
-          <li>MiBot does not guarantee successful message delivery, as delivery depends on external factors beyond our control (including WhatsApp policies).</li>
-          <li>MiBot reserves the right to suspend or cancel the service at any time and without prior notice.</li>
-        </ul>
-      </div>
-
-      <div class="terms-section">
-        <h2>5. Privacy and Data</h2>
-        <ul>
-          <li>MiBot does not sell or share user data with third parties.</li>
-          <li>WhatsApp session credentials are stored in encrypted form solely to maintain an active connection.</li>
-          <li>Scheduled messages are automatically deleted after 30 days or upon sending.</li>
-          <li>Users can request deletion of all their data by contacting the administrator.</li>
-        </ul>
-      </div>
-
-      <div class="terms-section">
-        <h2>6. Service Modifications</h2>
-        <p>MiBot reserves the right to modify, suspend, or discontinue any aspect of the service at any time. We may also modify these terms and conditions. Continued use of the service after changes are posted constitutes acceptance of those changes.</p>
-      </div>
-
-      <div class="terms-section">
-        <h2>7. Jurisdiction</h2>
-        <p>These terms are governed by the laws of the United Mexican States. Any dispute shall be submitted to the jurisdiction of the competent courts of Mexico City, Mexico.</p>
-      </div>
-
-      <div class="terms-section">
-        <h2>8. Contact</h2>
-        <p>For questions about these terms, write to us at: <a href="mailto:contacto@mibot.app" style="color:var(--green)">contacto@mibot.app</a></p>
-      </div>
-
-      <div class="terms-info-box">
-        <p>✅ By using MiBot, you confirm that you have read, understood, and fully accepted these Terms and Conditions, including all risks described herein.</p>
-      </div>
+      <div class="terms-warning-box"><p>⚠️ <strong>WARNING:</strong> This service is NOT affiliated with WhatsApp Inc. or Meta Platforms Inc. Automation tools may violate WhatsApp's Terms of Service. The user assumes all responsibility.</p></div>
+      <div class="terms-section"><h2>1. Nature of Service</h2><p>MiBot is an independent messaging automation service with no relation to WhatsApp Inc. or Meta Platforms Inc.</p><div class="terms-info-box"><p>🎁 <strong>Free Beta:</strong> Free until <strong>May 6, 2026</strong>. Monthly cost starts after that date.</p></div></div>
+      <div class="terms-section"><h2>2. User Risks and Responsibility</h2><ul><li>Use may result in <strong>temporary or permanent suspension</strong> of your WhatsApp number.</li><li>MiBot is not liable for bans, suspensions, or account loss.</li><li>Users are solely responsible for message content.</li><li>Recipients' consent is required per applicable privacy laws.</li></ul></div>
+      <div class="terms-section"><h2>3. Prohibited Use</h2><ul><li>Unsolicited messages (spam) at scale.</li><li>Illegal, offensive, or fraudulent content.</li><li>Mass marketing without express consent.</li><li>Activities violating local or international laws.</li></ul><div class="terms-warning-box"><p>⛔ Violations result in <strong>immediate cancellation</strong> of access.</p></div></div>
+      <div class="terms-section"><h2>4. Disclaimer</h2><p>MiBot is provided "as-is". We do not guarantee continuous availability or successful message delivery. We are not liable for any damages.</p></div>
+      <div class="terms-section"><h2>5. Privacy</h2><ul><li>We do not sell user data.</li><li>Scheduled messages are deleted after 30 days.</li><li>Passwords are hashed and never stored in plain text.</li></ul></div>
+      <div class="terms-section"><h2>6. Jurisdiction</h2><p>These terms are governed by Mexican law. Disputes before courts of Mexico City.</p></div>
+      <div class="terms-info-box"><p>✅ By registering, you confirm you have read and accepted these Terms in full.</p></div>
     </div>
-
   </div>
 </div>
 
 <script>
-// ── BACKEND URL ──────────────────────────────────────────────
 const BACKEND = 'https://whatsapp-production-0e14.up.railway.app'
 
-// ── LOGIN ────────────────────────────────────────────────────
 function openLogin () {
   document.getElementById('loginModal').classList.add('open')
   document.body.style.overflow = 'hidden'
-  setTimeout(() => document.getElementById('loginKey').focus(), 300)
+  setTimeout(() => document.getElementById('loginEmail').focus(), 300)
 }
 
 function closeLogin () {
   document.getElementById('loginModal').classList.remove('open')
   document.body.style.overflow = ''
-  document.getElementById('loginError').style.display = 'none'
+  document.getElementById('authError').style.display = 'none'
+  document.getElementById('authSuccess').style.display = 'none'
 }
 
-async function doLogin () {
-  const email    = document.getElementById('loginEmail').value.trim()
-  const key      = document.getElementById('loginKey').value.trim().toLowerCase()
-  const accepted = document.getElementById('termsCheck').checked
-  const btn      = document.getElementById('loginBtn')
-  const errDiv   = document.getElementById('loginError')
-
-  errDiv.style.display = 'none'
-
-  if (!email) { showError('Por favor ingresa tu email.'); return }
-  if (!key || key.length !== 8) { showError('La clave debe tener exactamente 8 caracteres.'); return }
-  if (!/^[0-9a-f]{8}$/.test(key)) { showError('La clave solo puede contener letras a-f y números.'); return }
-  if (!accepted) { showError('Debes aceptar los Términos y Condiciones para continuar.'); return }
-
-  btn.disabled = true
-  btn.textContent = 'Verificando...'
-
-  try {
-    // Login seguro: clave va en el body, nunca en la URL
-    const res = await fetch(`${BACKEND}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',  // necesario para cookies cross-origin
-      body: JSON.stringify({ key })
-    })
-
-    const data = await res.json()
-
-    if (data.success) {
-      btn.textContent = 'Redirigiendo...'
-      window.location.href = `${BACKEND}/dashboard`
-    } else {
-      showError('Clave incorrecta o inactiva. Contacta al administrador.')
-      btn.disabled = false
-      btn.textContent = 'Acceder al panel →'
-    }
-  } catch (err) {
-    showError('Error de conexión. Intenta de nuevo.')
-    btn.disabled = false
-    btn.textContent = 'Acceder al panel →'
-  }
+function switchTab (tab) {
+  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none'
+  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none'
+  document.getElementById('tab-login-btn').style.background = tab === 'login' ? 'white' : 'transparent'
+  document.getElementById('tab-login-btn').style.color = tab === 'login' ? '#1a1a2e' : '#666'
+  document.getElementById('tab-login-btn').style.boxShadow = tab === 'login' ? '0 1px 4px rgba(0,0,0,.08)' : 'none'
+  document.getElementById('tab-reg-btn').style.background = tab === 'register' ? 'white' : 'transparent'
+  document.getElementById('tab-reg-btn').style.color = tab === 'register' ? '#1a1a2e' : '#666'
+  document.getElementById('tab-reg-btn').style.boxShadow = tab === 'register' ? '0 1px 4px rgba(0,0,0,.08)' : 'none'
+  document.getElementById('authError').style.display = 'none'
+  document.getElementById('authSuccess').style.display = 'none'
 }
 
 function showError (msg) {
-  const errDiv = document.getElementById('loginError')
-  errDiv.textContent = msg
-  errDiv.style.display = 'block'
+  const el = document.getElementById('authError')
+  el.textContent = msg; el.style.display = 'block'
 }
 
-// ── TERMS ────────────────────────────────────────────────────
+function showSuccess (msg) {
+  const el = document.getElementById('authSuccess')
+  el.textContent = msg; el.style.display = 'block'
+  document.getElementById('authError').style.display = 'none'
+}
+
+async function doLogin () {
+  const email = document.getElementById('loginEmail').value.trim()
+  const password = document.getElementById('loginPassword').value
+  if (!email || !password) { showError('Ingresa tu email y contraseña.'); return }
+
+  const btn = document.querySelector('#form-login .btn-login')
+  btn.disabled = true; btn.textContent = 'Verificando...'
+
+  try {
+    const res = await fetch(BACKEND + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, password })
+    })
+    const d = await res.json()
+    if (d.success) {
+      btn.textContent = 'Redirigiendo...'
+      window.location.href = BACKEND + '/dashboard'
+    } else {
+      showError(d.error || 'Email o contraseña incorrectos')
+      btn.disabled = false; btn.textContent = 'Iniciar sesión →'
+    }
+  } catch (e) {
+    showError('Error de conexión. Intenta de nuevo.')
+    btn.disabled = false; btn.textContent = 'Iniciar sesión →'
+  }
+}
+
+async function doRegister () {
+  const email = document.getElementById('regEmail').value.trim()
+  const pass1 = document.getElementById('regPassword').value
+  const pass2 = document.getElementById('regPassword2').value
+  const terms = document.getElementById('termsCheck').checked
+
+  if (!email || !pass1) { showError('Completa todos los campos.'); return }
+  if (pass1.length < 6) { showError('La contraseña debe tener al menos 6 caracteres.'); return }
+  if (pass1 !== pass2) { showError('Las contraseñas no coinciden.'); return }
+  if (!terms) { showError('Debes aceptar los Términos y Condiciones.'); return }
+
+  const btn = document.querySelector('#form-register .btn-login')
+  btn.disabled = true; btn.textContent = 'Creando cuenta...'
+
+  try {
+    const res = await fetch(BACKEND + '/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, password: pass1 })
+    })
+    const d = await res.json()
+    if (d.success) {
+      btn.textContent = 'Redirigiendo...'
+      window.location.href = BACKEND + '/dashboard'
+    } else {
+      showError(d.error || 'Error al crear cuenta')
+      btn.disabled = false; btn.textContent = 'Crear cuenta →'
+    }
+  } catch (e) {
+    showError('Error de conexión. Intenta de nuevo.')
+    btn.disabled = false; btn.textContent = 'Crear cuenta →'
+  }
+}
+
 function openTerms () {
   document.getElementById('termsPage').classList.add('open')
   document.body.style.overflow = 'hidden'
   document.getElementById('termsPage').scrollTop = 0
-  // Cerrar modal si está abierto
-  document.getElementById('loginModal').classList.remove('open')
 }
 
 function closeTerms () {
@@ -1084,7 +987,6 @@ function setLang (lang, btn) {
   btn.classList.add('active')
 }
 
-// Cerrar con Escape
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeLogin(); closeTerms() }
 })
