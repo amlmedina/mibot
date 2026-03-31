@@ -868,6 +868,22 @@ footer a:hover { text-decoration: underline; }
 <script>
 const BACKEND = 'https://whatsapp-production-0e14.up.railway.app'
 
+// Mostrar error si viene de Railway redirect
+window.addEventListener('load', () => {
+  const params = new URLSearchParams(window.location.search)
+  const error = params.get('error')
+  if (error) {
+    openLogin()
+    const msgs = {
+      'missing': 'Email y contraseña requeridos.',
+      'password_short': 'La contraseña debe tener al menos 6 caracteres.',
+      'conexion': 'Error de conexión. Intenta de nuevo.',
+    }
+    setTimeout(() => showError(msgs[error] || decodeURIComponent(error)), 400)
+    window.history.replaceState({}, '', window.location.pathname)
+  }
+})
+
 function openLogin () {
   document.getElementById('loginModal').classList.add('open')
   document.body.style.overflow = 'hidden'
@@ -906,32 +922,23 @@ function showSuccess (msg) {
 }
 
 async function doLogin () {
-  const email = document.getElementById('loginEmail').value.trim()
+  const email    = document.getElementById('loginEmail').value.trim()
   const password = document.getElementById('loginPassword').value
   if (!email || !password) { showError('Ingresa tu email y contraseña.'); return }
 
   const btn = document.querySelector('#form-login .btn-login')
-  btn.disabled = true; btn.textContent = 'Verificando...'
+  btn.disabled = true; btn.textContent = 'Redirigiendo...'
 
-  try {
-    const res = await fetch(BACKEND + '/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, password })
-    })
-    const d = await res.json()
-    if (d.success) {
-      btn.textContent = 'Redirigiendo...'
-      window.location.href = BACKEND + '/dashboard'
-    } else {
-      showError(d.error || 'Email o contraseña incorrectos')
-      btn.disabled = false; btn.textContent = 'Iniciar sesión →'
-    }
-  } catch (e) {
-    showError('Error de conexión. Intenta de nuevo.')
-    btn.disabled = false; btn.textContent = 'Iniciar sesión →'
-  }
+  // Usar form POST para evitar problemas CORS con cookies
+  const form = document.createElement('form')
+  form.method = 'POST'
+  form.action = BACKEND + '/auth/login-redirect'
+  form.style.display = 'none'
+  const fe = document.createElement('input'); fe.name = 'email'; fe.value = email
+  const fp = document.createElement('input'); fp.name = 'password'; fp.value = password
+  form.appendChild(fe); form.appendChild(fp)
+  document.body.appendChild(form)
+  form.submit()
 }
 
 async function doRegister () {
@@ -948,25 +955,16 @@ async function doRegister () {
   const btn = document.querySelector('#form-register .btn-login')
   btn.disabled = true; btn.textContent = 'Creando cuenta...'
 
-  try {
-    const res = await fetch(BACKEND + '/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, password: pass1 })
-    })
-    const d = await res.json()
-    if (d.success) {
-      btn.textContent = 'Redirigiendo...'
-      window.location.href = BACKEND + '/dashboard'
-    } else {
-      showError(d.error || 'Error al crear cuenta')
-      btn.disabled = false; btn.textContent = 'Crear cuenta →'
-    }
-  } catch (e) {
-    showError('Error de conexión. Intenta de nuevo.')
-    btn.disabled = false; btn.textContent = 'Crear cuenta →'
-  }
+  // Usar form POST para evitar problemas CORS con cookies
+  const form = document.createElement('form')
+  form.method = 'POST'
+  form.action = BACKEND + '/auth/register-redirect'
+  form.style.display = 'none'
+  const fe = document.createElement('input'); fe.name = 'email'; fe.value = email
+  const fp = document.createElement('input'); fp.name = 'password'; fp.value = pass1
+  form.appendChild(fe); form.appendChild(fp)
+  document.body.appendChild(form)
+  form.submit()
 }
 
 function openTerms () {
