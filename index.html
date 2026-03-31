@@ -1028,26 +1028,14 @@ async function doLogin () {
   if (!accepted) { showError('Debes aceptar los Términos y Condiciones para continuar.'); return }
 
   btn.disabled = true
-  btn.textContent = 'Verificando...'
+  btn.textContent = 'Redirigiendo...'
 
-  try {
-    // Verificar que la clave existe consultando el panel
-    const res = await fetch(`${BACKEND}/${key}`, { method: 'GET' })
+  sessionStorage.setItem('mibot_key', key)
+  sessionStorage.setItem('mibot_email', email)
 
-    if (res.ok && !res.url.includes('error')) {
-      // Guardar en sessionStorage y redirigir
-      sessionStorage.setItem('mibot_key', key)
-      sessionStorage.setItem('mibot_email', email)
-      window.location.href = `${BACKEND}/${key}`
-    } else {
-      showError('Clave incorrecta o inactiva. Contacta al administrador.')
-    }
-  } catch (err) {
-    showError('Error de conexión. Intenta de nuevo.')
-  }
-
-  btn.disabled = false
-  btn.textContent = 'Acceder al panel →'
+  setTimeout(() => {
+    window.location.href = `${BACKEND}/${key}`
+  }, 400)
 }
 
 function showError (msg) {
