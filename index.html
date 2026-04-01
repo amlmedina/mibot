@@ -171,18 +171,18 @@ footer{padding:40px 20px;border-top:1px solid var(--border);display:flex;align-i
 </nav>
 
 <section class="hero">
-  <div class="hero-badge"><div class="dot"></div> Beta activa — Pruébalo gratis</div>
+  
   <h1>Automatiza <em>WhatsApp</em><br>para tu negocio</h1>
   <p class="hero-sub">Programa mensajes, conecta tu número y automatiza WhatsApp desde Google Sheets, Apps Script, Python o Java. Sin la API oficial de Meta.</p>
   <div class="hero-actions">
-    <a href="#" class="btn-primary" onclick="openModal('register')">Empezar gratis →</a>
+    <a href="#" class="btn-primary" onclick="openModal('register')">Suscribirse →</a>
     <a href="#como-funciona" class="btn-secondary">Ver cómo funciona</a>
   </div>
   <div class="hero-social">
     <div class="avatars">
       <div class="avatar">👨‍💼</div><div class="avatar">👩‍💻</div><div class="avatar">👨‍🔧</div><div class="avatar">👩‍💼</div>
     </div>
-    <span>+100 negocios ya automatizan con MiBot</span>
+    <span>+100 negocios en Latinoamérica usan MiBot</span>
   </div>
 </section>
 
@@ -206,7 +206,7 @@ footer{padding:40px 20px;border-top:1px solid var(--border);display:flex;align-i
       <p class="section-sub">Sin configuraciones complicadas. Sin la API oficial de Meta.</p>
     </div>
     <div class="steps reveal">
-      <div class="step-card"><div class="step-num">1</div><h3>Crea tu cuenta</h3><p>Regístrate con tu email y contraseña. Sin tarjeta de crédito para empezar. Acceso inmediato al panel.</p></div>
+      <div class="step-card"><div class="step-num">1</div><h3>Crea tu cuenta</h3><p>Regístrate con tu email y contraseña. Elige tu plan y accede al panel de inmediato.</p></div>
       <div class="step-card"><div class="step-num">2</div><h3>Conecta tu WhatsApp</h3><p>Escanea el código QR desde el panel con tu WhatsApp. El proceso toma menos de 30 segundos.</p></div>
       <div class="step-card"><div class="step-num">3</div><h3>Automatiza y programa</h3><p>Usa el panel web, importa desde Google Sheets o conecta la API REST desde tu código favorito.</p></div>
     </div>
@@ -320,7 +320,7 @@ H = {<span class="st">"x-api-key"</span>: KEY}
           <li class="dim">Importación masiva CSV</li>
           <li class="dim">Historial 90 días</li>
         </ul>
-        <button class="btn-plan-basic" onclick="openModal('register')">Comenzar con Básico</button>
+        <button class="btn-plan-basic" onclick="openModal('register')">Suscribirse — $1/mes</button>
       </div>
       <div class="pricing-card featured">
         <div class="pricing-badge">MÁS POPULAR</div>
@@ -336,10 +336,10 @@ H = {<span class="st">"x-api-key"</span>: KEY}
           <li>Importación masiva CSV / Sheets</li>
           <li>Historial 90 días</li>
         </ul>
-        <button class="btn-plan-pro" onclick="openModal('register')">Comenzar con Pro</button>
+        <button class="btn-plan-pro" onclick="openModal('register')">Suscribirse — $5/mes</button>
       </div>
     </div>
-    <p class="pricing-note reveal">💳 Pago seguro con Stripe · Cancela en cualquier momento · Sin permanencia</p>
+    <p class="pricing-note reveal">💳 Pago seguro con Stripe · Cancela en cualquier momento</p>
   </div>
 </section>
 
@@ -364,7 +364,7 @@ H = {<span class="st">"x-api-key"</span>: KEY}
   <div class="container">
     <h2 class="reveal">¿Listo para automatizar<br>tu WhatsApp?</h2>
     <p class="reveal">Únete a cientos de negocios en Latinoamérica que ya usan MiBot.</p>
-    <div class="reveal"><a href="#" class="btn-primary" onclick="openModal('register')" style="font-size:17px;padding:17px 40px">Crear cuenta gratis →</a></div>
+    <div class="reveal"><a href="#" class="btn-primary" onclick="openModal('register')" style="font-size:17px;padding:17px 40px">Comenzar ahora →</a></div>
   </div>
 </section>
 
@@ -384,7 +384,7 @@ H = {<span class="st">"x-api-key"</span>: KEY}
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-logo">MiBot <span>WA</span></div>
-    <p class="modal-sub" id="modalSub">Automatiza tu WhatsApp hoy</p>
+    <p class="modal-sub" id="modalSub">Elige tu plan</p>
     <div class="form-tabs">
       <button class="form-tab" id="tab-login" onclick="switchTab('login')">Iniciar sesión</button>
       <button class="form-tab" id="tab-register" onclick="switchTab('register')">Registrarse</button>
@@ -394,7 +394,7 @@ H = {<span class="st">"x-api-key"</span>: KEY}
       <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" class="form-input" placeholder="tu@email.com" autocomplete="email"/></div>
       <div class="form-group"><label class="form-label">Contraseña</label><input type="password" id="loginPass" class="form-input" placeholder="Tu contraseña" onkeypress="if(event.key==='Enter')doLogin()"/></div>
       <button class="form-btn" onclick="doLogin()" id="btnLogin">Iniciar sesión →</button>
-      <p class="form-note">¿No tienes cuenta? <a href="#" onclick="switchTab('register')">Regístrate gratis</a></p>
+      <p class="form-note">¿No tienes cuenta? <a href="#" onclick="switchTab('register')">Crear cuenta</a></p>
     </div>
     <div id="formRegister" style="display:none">
       <div class="form-group"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-input" placeholder="tu@email.com" autocomplete="email"/></div>
@@ -434,7 +434,7 @@ function switchTab(tab){
   document.getElementById('formRegister').style.display=tab==='register'?'block':'none'
   document.getElementById('tab-login').classList.toggle('active',tab==='login')
   document.getElementById('tab-register').classList.toggle('active',tab==='register')
-  document.getElementById('modalSub').textContent=tab==='login'?'Bienvenido de nuevo':'Automatiza tu WhatsApp hoy'
+  document.getElementById('modalSub').textContent=tab==='login'?'Bienvenido de nuevo':'Elige tu plan'
   clearError()
 }
 function showError(msg){const el=document.getElementById('formError');el.textContent=msg;el.style.display='block'}
