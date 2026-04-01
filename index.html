@@ -1,993 +1,510 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MiBot — WhatsApp Automation</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<style>
-:root {
-  --green:     #25d366;
-  --green-d:   #128c7e;
-  --green-dk:  #075e54;
-  --dark:      #0a0f0d;
-  --dark2:     #111810;
-  --card:      #141a16;
-  --border:    rgba(37,211,102,.15);
-  --text:      #e8f5e9;
-  --muted:     #7a9980;
-  --danger:    #ff6b6b;
-  --warning:   #ffd93d;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--dark);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* ── Background grid ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(37,211,102,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(37,211,102,.04) 1px, transparent 1px);
-  background-size: 48px 48px;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ── Glow blobs ── */
-.blob {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(120px);
-  pointer-events: none;
-  z-index: 0;
-}
-.blob-1 { width: 600px; height: 600px; background: rgba(37,211,102,.08); top: -200px; right: -200px; }
-.blob-2 { width: 400px; height: 400px; background: rgba(18,140,126,.06); bottom: -100px; left: -100px; }
-
-/* ── NAV ── */
-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 40px;
-  background: rgba(10,15,13,.8);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-}
-
-.nav-logo {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 22px;
-  color: var(--green);
-  letter-spacing: -0.5px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.nav-logo span { color: var(--text); }
-
-.nav-links { display: flex; gap: 32px; }
-.nav-links a {
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  transition: color .2s;
-}
-.nav-links a:hover { color: var(--text); }
-
-.nav-cta {
-  background: var(--green);
-  color: var(--dark);
-  border: none;
-  padding: 9px 22px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  transition: background .2s, transform .15s;
-}
-.nav-cta:hover { background: #20c05a; transform: translateY(-1px); }
-
-/* ── HERO ── */
-.hero {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding: 120px 40px 80px;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.hero-content { max-width: 620px; }
-
-.beta-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(37,211,102,.1);
-  border: 1px solid rgba(37,211,102,.3);
-  color: var(--green);
-  padding: 5px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .5px;
-  text-transform: uppercase;
-  margin-bottom: 24px;
-}
-
-.beta-dot {
-  width: 7px; height: 7px;
-  background: var(--green);
-  border-radius: 50%;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: .5; transform: scale(.8); }
-}
-
-.hero h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(42px, 7vw, 76px);
-  font-weight: 800;
-  line-height: 1.0;
-  letter-spacing: -2px;
-  margin-bottom: 24px;
-}
-
-.hero h1 em {
-  font-style: normal;
-  color: var(--green);
-  position: relative;
-}
-
-.hero p {
-  font-size: 18px;
-  color: var(--muted);
-  line-height: 1.7;
-  margin-bottom: 40px;
-  font-weight: 300;
-  max-width: 480px;
-}
-
-.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
-
-.btn-primary {
-  background: var(--green);
-  color: var(--dark);
-  border: none;
-  padding: 14px 32px;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  transition: all .2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.btn-primary:hover { background: #20c05a; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(37,211,102,.25); }
-
-.btn-secondary {
-  background: transparent;
-  color: var(--text);
-  border: 1px solid var(--border);
-  padding: 14px 32px;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  transition: all .2s;
-}
-.btn-secondary:hover { border-color: rgba(37,211,102,.4); color: var(--green); }
-
-/* ── PRICING NOTICE ── */
-.pricing-notice {
-  position: relative;
-  z-index: 1;
-  margin: 0 auto 80px;
-  max-width: 900px;
-  padding: 0 40px;
-}
-
-.pricing-card {
-  background: linear-gradient(135deg, rgba(37,211,102,.08), rgba(18,140,126,.05));
-  border: 1px solid rgba(37,211,102,.2);
-  border-radius: 16px;
-  padding: 28px 36px;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.pricing-icon { font-size: 40px; flex-shrink: 0; }
-
-.pricing-text h3 {
-  font-family: 'Syne', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: var(--green);
-}
-
-.pricing-text p { font-size: 14px; color: var(--muted); line-height: 1.6; }
-.pricing-text p strong { color: var(--warning); }
-
-/* ── FEATURES ── */
-.features {
-  position: relative;
-  z-index: 1;
-  max-width: 1100px;
-  margin: 0 auto 100px;
-  padding: 0 40px;
-}
-
-.section-label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--green);
-  margin-bottom: 16px;
-}
-
-.section-title {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(28px, 4vw, 42px);
-  font-weight: 700;
-  letter-spacing: -1px;
-  margin-bottom: 48px;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
-
-.feature-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 28px;
-  transition: border-color .2s, transform .2s;
-}
-
-.feature-card:hover {
-  border-color: rgba(37,211,102,.35);
-  transform: translateY(-3px);
-}
-
-.feature-icon {
-  width: 44px; height: 44px;
-  background: rgba(37,211,102,.1);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  margin-bottom: 16px;
-}
-
-.feature-card h3 {
-  font-family: 'Syne', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.feature-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
-
-/* ── WARNING SECTION ── */
-.warnings {
-  position: relative;
-  z-index: 1;
-  max-width: 900px;
-  margin: 0 auto 100px;
-  padding: 0 40px;
-}
-
-.warning-card {
-  background: rgba(255,107,107,.05);
-  border: 1px solid rgba(255,107,107,.2);
-  border-radius: 14px;
-  padding: 28px 32px;
-  margin-bottom: 16px;
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.warning-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
-
-.warning-card h4 {
-  font-family: 'Syne', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--danger);
-  margin-bottom: 6px;
-}
-
-.warning-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
-
-/* ── LOGIN MODAL ── */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.85);
-  backdrop-filter: blur(8px);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.modal-overlay.open { display: flex; }
-
-.modal {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  width: 100%;
-  max-width: 440px;
-  padding: 40px;
-  position: relative;
-  animation: modalIn .25s ease;
-}
-
-@keyframes modalIn {
-  from { opacity: 0; transform: translateY(20px) scale(.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.modal-close {
-  position: absolute;
-  top: 16px; right: 16px;
-  background: rgba(255,255,255,.05);
-  border: none;
-  color: var(--muted);
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .2s;
-}
-.modal-close:hover { background: rgba(255,255,255,.1); color: var(--text); }
-
-.modal-logo {
-  font-family: 'Syne', sans-serif;
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--green);
-  margin-bottom: 4px;
-}
-
-.modal-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
-
-.form-group { margin-bottom: 18px; }
-
-.form-group label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  margin-bottom: 8px;
-}
-
-.form-group input {
-  width: 100%;
-  background: rgba(255,255,255,.04);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-size: 15px;
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  transition: border-color .2s;
-  outline: none;
-}
-
-.form-group input:focus { border-color: rgba(37,211,102,.5); }
-.form-group input::placeholder { color: rgba(122,153,128,.5); }
-
-.terms-check {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  margin-bottom: 24px;
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-
-.terms-check input[type="checkbox"] {
-  width: 16px; height: 16px;
-  margin-top: 2px;
-  flex-shrink: 0;
-  accent-color: var(--green);
-  cursor: pointer;
-}
-
-.terms-check a {
-  color: var(--green);
-  text-decoration: none;
-}
-.terms-check a:hover { text-decoration: underline; }
-
-.btn-login {
-  width: 100%;
-  background: var(--green);
-  color: var(--dark);
-  border: none;
-  padding: 14px;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  transition: all .2s;
-  margin-bottom: 16px;
-}
-.btn-login:hover { background: #20c05a; }
-.btn-login:disabled { opacity: .5; cursor: not-allowed; }
-
-.login-error {
-  background: rgba(255,107,107,.1);
-  border: 1px solid rgba(255,107,107,.3);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 13px;
-  color: var(--danger);
-  margin-bottom: 16px;
-  display: none;
-}
-
-.login-note {
-  font-size: 12px;
-  color: var(--muted);
-  text-align: center;
-  line-height: 1.5;
-}
-
-/* ── TERMS PAGE ── */
-.terms-page {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: var(--dark);
-  z-index: 300;
-  overflow-y: auto;
-}
-
-.terms-page.open { display: block; }
-
-.terms-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 60px 40px;
-}
-
-.terms-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--green);
-  background: none;
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  margin-bottom: 40px;
-  transition: gap .2s;
-}
-.terms-back:hover { gap: 12px; }
-
-.terms-header {
-  margin-bottom: 48px;
-  padding-bottom: 32px;
-  border-bottom: 1px solid var(--border);
-}
-
-.terms-header h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: 36px;
-  font-weight: 800;
-  letter-spacing: -1px;
-  margin-bottom: 12px;
-}
-
-.terms-header p { font-size: 14px; color: var(--muted); }
-
-.terms-lang-toggle {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 40px;
-}
-
-.lang-btn {
-  padding: 6px 18px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--muted);
-  font-family: 'DM Sans', sans-serif;
-  transition: all .2s;
-}
-
-.lang-btn.active {
-  background: var(--green);
-  color: var(--dark);
-  border-color: var(--green);
-}
-
-.terms-content { display: none; }
-.terms-content.active { display: block; }
-
-.terms-section {
-  margin-bottom: 40px;
-}
-
-.terms-section h2 {
-  font-family: 'Syne', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--green);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.terms-section p, .terms-section li {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.8;
-  margin-bottom: 10px;
-}
-
-.terms-section ul { padding-left: 20px; }
-.terms-section li { margin-bottom: 8px; }
-
-.terms-warning-box {
-  background: rgba(255,107,107,.07);
-  border: 1px solid rgba(255,107,107,.25);
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin: 16px 0;
-}
-
-.terms-warning-box p { color: #ffaaaa; font-size: 14px; line-height: 1.7; margin: 0; }
-
-.terms-info-box {
-  background: rgba(37,211,102,.06);
-  border: 1px solid rgba(37,211,102,.2);
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin: 16px 0;
-}
-
-.terms-info-box p { color: #a8e6c0; font-size: 14px; line-height: 1.7; margin: 0; }
-
-/* ── FOOTER ── */
-footer {
-  position: relative;
-  z-index: 1;
-  border-top: 1px solid var(--border);
-  padding: 40px;
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.footer-logo {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  color: var(--green);
-  font-size: 18px;
-}
-
-footer p { font-size: 13px; color: var(--muted); }
-
-footer a { color: var(--green); text-decoration: none; }
-footer a:hover { text-decoration: underline; }
-
-@media (max-width: 768px) {
-  nav { padding: 16px 20px; }
-  .nav-links { display: none; }
-  .hero { padding: 100px 20px 60px; }
-  .features, .warnings, .pricing-notice { padding: 0 20px; }
-  footer { padding: 32px 20px; }
-  .modal { padding: 28px 24px; }
-  .terms-container { padding: 40px 20px; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiBot WA — Automatiza WhatsApp para tu negocio | Desde $1/mes</title>
+  <meta name="description" content="Automatiza mensajes de WhatsApp para tu negocio. Programa envíos masivos, integra con Google Sheets, Apps Script y Python. API REST incluida. Ideal para vendedores, agencias y desarrolladores en Latinoamérica.">
+  <meta name="keywords" content="automatizar whatsapp, bot whatsapp, mensajes programados whatsapp, whatsapp api, automatización whatsapp latinoamérica, enviar whatsapp masivo, whatsapp marketing">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://amlmedina.github.io/mibot/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://amlmedina.github.io/mibot/">
+  <meta property="og:title" content="MiBot WA — Automatiza WhatsApp para tu negocio">
+  <meta property="og:description" content="Programa mensajes, conecta tu número y automatiza WhatsApp desde Apps Script, Python o Java. Desde $1/mes.">
+  <meta property="og:locale" content="es_LA">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"MiBot WA","description":"Plataforma de automatización de WhatsApp para negocios.","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":[{"@type":"Offer","name":"Plan Básico","price":"1.00","priceCurrency":"USD"},{"@type":"Offer","name":"Plan Pro","price":"5.00","priceCurrency":"USD"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Necesito la API oficial de WhatsApp Business?","acceptedAnswer":{"@type":"Answer","text":"No. MiBot funciona con tu número de WhatsApp normal. Solo escaneas un código QR."}},{"@type":"Question","name":"¿Cuánto cuesta MiBot?","acceptedAnswer":{"@type":"Answer","text":"El plan Básico cuesta $1 USD por mes. El plan Pro cuesta $5 USD por mes con mensajes ilimitados."}},{"@type":"Question","name":"¿Funciona en toda Latinoamérica?","acceptedAnswer":{"@type":"Answer","text":"Sí. Funciona con cualquier número de WhatsApp de cualquier país."}}]}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+:root{--green:#00d46a;--green-dark:#00a854;--green-dim:rgba(0,212,106,.12);--black:#090e0b;--surface:#111714;--surface2:#182019;--border:rgba(255,255,255,.08);--text:#e8f0eb;--muted:#7a9080;--white:#ffffff}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);line-height:1.6;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:18px 40px;background:rgba(9,14,11,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--white);text-decoration:none}.nav-logo span{color:var(--green)}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--green)!important;color:var(--black)!important;padding:9px 20px;border-radius:8px;font-weight:600!important}
+.nav-cta:hover{background:#00ff7f!important;transform:translateY(-1px)}
+@media(max-width:768px){nav{padding:16px 20px}.nav-links{display:none}}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 20px 80px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;top:20%;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(0,212,106,.13) 0%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--green-dim);border:1px solid rgba(0,212,106,.3);color:var(--green);padding:6px 18px;border-radius:100px;font-size:13px;font-weight:500;margin-bottom:28px;animation:fadeUp .6s ease both}
+.dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(38px,7.5vw,80px);line-height:1.04;letter-spacing:-2.5px;color:var(--white);margin-bottom:22px;max-width:920px;animation:fadeUp .7s .1s ease both}
+h1 em{font-style:normal;color:var(--green);position:relative}
+h1 em::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:3px;background:var(--green);border-radius:2px;opacity:.35}
+.hero-sub{font-size:clamp(16px,2.5vw,20px);color:var(--muted);max-width:560px;margin-bottom:40px;font-weight:300;line-height:1.7;animation:fadeUp .7s .2s ease both}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;animation:fadeUp .7s .3s ease both}
+.btn-primary{background:var(--green);color:var(--black);border:none;padding:15px 32px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary:hover{background:#00ff7f;transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,212,106,.3)}
+.btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border);padding:15px 32px;border-radius:10px;font-size:16px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-secondary:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.04)}
+.hero-social{margin-top:56px;display:flex;align-items:center;gap:20px;animation:fadeUp .7s .4s ease both}
+.hero-social span{font-size:13px;color:var(--muted)}
+.avatars{display:flex}
+.avatar{width:32px;height:32px;border-radius:50%;border:2px solid var(--black);margin-left:-8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:13px}
+.avatar:first-child{margin-left:0}
+.logos-section{padding:48px 20px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);text-align:center}
+.logos-section p{font-size:11px;text-transform:uppercase;letter-spacing:2.5px;color:var(--muted);margin-bottom:28px}
+.logos-row{display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;opacity:.45}
+.logo-item{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--muted);display:flex;align-items:center;gap:8px}
+section{padding:96px 20px}
+.container{max-width:1100px;margin:0 auto}
+.section-label{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:var(--green);font-weight:600;margin-bottom:14px}
+.section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:clamp(28px,4vw,48px);line-height:1.08;letter-spacing:-1.5px;color:var(--white);margin-bottom:16px}
+.section-sub{font-size:16px;color:var(--muted);max-width:500px;line-height:1.7}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:56px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+@media(max-width:768px){.steps{grid-template-columns:1fr}}
+.step-card{background:var(--surface);padding:36px 32px}
+.step-num{font-family:'Syne',sans-serif;font-weight:800;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:12px;font-size:22px;color:var(--green);background:var(--green-dim);border:1px solid rgba(0,212,106,.2);margin-bottom:18px}
+.step-card h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:10px}
+.step-card p{font-size:14px;color:var(--muted);line-height:1.7}
+.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;margin-top:56px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+@media(max-width:768px){.features-grid{grid-template-columns:1fr}}
+.feature-card{background:var(--surface);padding:36px;transition:background .2s}
+.feature-card:hover{background:var(--surface2)}
+.feature-icon{width:48px;height:48px;border-radius:12px;background:var(--green-dim);border:1px solid rgba(0,212,106,.2);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px}
+.feature-card h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--white);margin-bottom:10px}
+.feature-card p{font-size:14px;color:var(--muted);line-height:1.7}
+.code-section{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.code-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+@media(max-width:900px){.code-grid{grid-template-columns:1fr;gap:40px}}
+.code-block{background:#0a0f0c;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.code-header{display:flex;align-items:center;gap:6px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.code-dot{width:10px;height:10px;border-radius:50%}
+.code-tabs{display:flex;gap:4px;margin-left:auto}
+.code-tab{font-size:11px;color:var(--muted);padding:4px 10px;border-radius:4px;cursor:pointer;transition:all .15s;border:none;background:transparent;font-family:inherit}
+.code-tab.active{background:var(--green-dim);color:var(--green)}
+pre.code{padding:20px 18px;font-size:12.5px;line-height:1.85;overflow-x:auto;color:#b8c8be;font-family:'SF Mono','Fira Code',monospace}
+.kw{color:#00d46a;font-weight:600}.fn{color:#82cfff}.st{color:#ffd700}.cm{color:#4a6050;font-style:italic}.nm{color:#f0a0ff}
+.pricing-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:800px;margin:56px auto 0}
+@media(max-width:640px){.pricing-grid{grid-template-columns:1fr}}
+.pricing-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px 32px;position:relative;transition:transform .2s,box-shadow .2s}
+.pricing-card:hover{transform:translateY(-4px);box-shadow:0 24px 48px rgba(0,0,0,.4)}
+.pricing-card.featured{border-color:var(--green);background:linear-gradient(160deg,rgba(0,212,106,.06),var(--surface))}
+.pricing-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--green);color:var(--black);font-size:11px;font-weight:700;padding:4px 16px;border-radius:100px;white-space:nowrap;letter-spacing:.5px}
+.pricing-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--white);margin-bottom:8px}
+.pricing-price{font-family:'Syne',sans-serif;font-size:54px;font-weight:800;color:var(--white);line-height:1;margin-bottom:4px}
+.pricing-price sup{font-size:22px;font-weight:600;vertical-align:super}
+.pricing-price sub{font-size:16px;font-weight:400;color:var(--muted);vertical-align:baseline}
+.pricing-desc{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.6}
+.pricing-features{list-style:none;margin-bottom:28px}
+.pricing-features li{display:flex;align-items:flex-start;gap:10px;padding:8px 0;font-size:14px;color:var(--text);border-bottom:1px solid var(--border)}
+.pricing-features li:last-child{border-bottom:none}
+.pricing-features li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px}
+.pricing-features li.dim{color:var(--muted)}.pricing-features li.dim::before{color:var(--muted);content:'○'}
+.btn-plan-basic{width:100%;padding:13px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.15)}
+.btn-plan-basic:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.04)}
+.btn-plan-pro{width:100%;padding:13px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;background:var(--green);color:var(--black);border:none}
+.btn-plan-pro:hover{background:#00ff7f;transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,212,106,.3)}
+.pricing-note{text-align:center;font-size:13px;color:var(--muted);margin-top:24px}
+.faq-list{margin-top:56px;max-width:760px}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:22px 0;cursor:pointer;font-size:16px;font-weight:500;color:var(--text);gap:20px;user-select:none;transition:color .2s}
+.faq-q:hover{color:var(--white)}
+.faq-icon{font-size:22px;color:var(--green);flex-shrink:0;transition:transform .25s;line-height:1}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;font-size:14px;color:var(--muted);line-height:1.8}
+.faq-item.open .faq-a{max-height:300px;padding-bottom:22px}
+.cta-section{text-align:center;padding:96px 20px;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(0,212,106,.1) 0%,transparent 70%);pointer-events:none}
+.cta-section h2{font-family:'Syne',sans-serif;font-size:clamp(30px,5vw,56px);font-weight:800;color:var(--white);letter-spacing:-1.5px;line-height:1.08;margin-bottom:16px}
+.cta-section p{font-size:17px;color:var(--muted);margin-bottom:36px;font-weight:300}
+footer{padding:40px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;max-width:1100px;margin:0 auto}
+.footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--muted);text-decoration:none}.footer-logo span{color:var(--green)}
+.footer-links{display:flex;gap:24px;list-style:none}
+.footer-links a{font-size:13px;color:var(--muted);text-decoration:none;transition:color .2s}.footer-links a:hover{color:var(--text)}
+.footer-copy{font-size:12px;color:var(--muted)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;align-items:flex-end;justify-content:center;backdrop-filter:blur(10px)}
+@media(min-width:600px){.modal-overlay{align-items:center;padding:20px}}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:440px;padding:32px 28px;position:relative}
+@media(min-width:600px){.modal{border-radius:20px}}
+.modal-close{position:absolute;top:18px;right:18px;background:var(--surface2);border:none;color:var(--muted);font-size:18px;cursor:pointer;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s}.modal-close:hover{color:var(--text)}
+.modal-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:var(--white);margin-bottom:4px}.modal-logo span{color:var(--green)}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:22px}
+.form-tabs{display:flex;background:var(--surface2);border-radius:10px;padding:3px;margin-bottom:18px}
+.form-tab{flex:1;padding:8px;text-align:center;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border:none;background:transparent;font-family:inherit;transition:all .15s}
+.form-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px}
+.form-input{width:100%;padding:11px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;color:var(--text);outline:none;transition:border .2s}
+.form-input:focus{border-color:var(--green)}.form-input::placeholder{color:var(--muted)}
+.form-btn{width:100%;padding:13px;background:var(--green);color:var(--black);border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:4px}
+.form-btn:hover{background:#00ff7f}.form-btn:disabled{opacity:.6;cursor:not-allowed}
+.form-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:10px 14px;font-size:13px;color:#f87171;margin-bottom:14px;display:none}
+.form-note{text-align:center;font-size:12px;color:var(--muted);margin-top:12px}.form-note a{color:var(--green);text-decoration:none}
+.terms-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.terms-row input[type="checkbox"]{margin-top:2px;accent-color:var(--green);flex-shrink:0}
+.terms-row label{font-size:12px;color:var(--muted);line-height:1.5}.terms-row label a{color:var(--green);text-decoration:none}
+.terms-page{display:none;position:fixed;inset:0;background:var(--black);z-index:600;overflow-y:auto}
+.terms-page.open{display:block}
+.terms-inner{max-width:720px;margin:0 auto;padding:60px 24px}
+.terms-back{display:inline-flex;align-items:center;gap:8px;color:var(--green);font-size:14px;font-weight:500;margin-bottom:40px;cursor:pointer;background:none;border:none;font-family:inherit;text-decoration:none}
+.terms-inner h1{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--white);margin-bottom:8px}
+.terms-meta{font-size:13px;color:var(--muted);margin-bottom:40px}
+.terms-inner h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white);margin:32px 0 12px}
+.terms-inner p,.terms-inner li{font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:8px}
+.terms-inner ul{padding-left:20px}
+.terms-warn{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:16px 20px;font-size:13px;color:#f87171;margin-bottom:24px}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+  </style>
 </head>
 <body>
 
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
-
-<!-- NAV -->
 <nav>
-  <div class="nav-logo">MiBot <span>WA</span></div>
-  <div class="nav-links">
-    <a href="#features">Funciones</a>
-    <a href="#warnings">Advertencias</a>
-    <a href="#" onclick="openTerms()">Términos</a>
-  </div>
-  <button class="nav-cta" onclick="openLogin()">Acceder →</button>
+  <a href="/" class="nav-logo">MiBot <span>WA</span></a>
+  <ul class="nav-links">
+    <li><a href="#como-funciona">Cómo funciona</a></li>
+    <li><a href="#funciones">Funciones</a></li>
+    <li><a href="#precios">Precios</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#" class="nav-cta" onclick="openModal('login')">Iniciar sesión</a></li>
+  </ul>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
-  <div class="hero-content">
-    <div class="beta-badge">
-      <div class="beta-dot"></div>
-      Beta Gratuita
+  <div class="hero-badge"><div class="dot"></div> Beta activa — Pruébalo gratis</div>
+  <h1>Automatiza <em>WhatsApp</em><br>para tu negocio</h1>
+  <p class="hero-sub">Programa mensajes, conecta tu número y automatiza WhatsApp desde Google Sheets, Apps Script, Python o Java. Sin la API oficial de Meta.</p>
+  <div class="hero-actions">
+    <a href="#" class="btn-primary" onclick="openModal('register')">Empezar gratis →</a>
+    <a href="#como-funciona" class="btn-secondary">Ver cómo funciona</a>
+  </div>
+  <div class="hero-social">
+    <div class="avatars">
+      <div class="avatar">👨‍💼</div><div class="avatar">👩‍💻</div><div class="avatar">👨‍🔧</div><div class="avatar">👩‍💼</div>
     </div>
-    <h1>Automatiza tu<br><em>WhatsApp</em><br>sin esfuerzo.</h1>
-    <p>Programa mensajes, conecta tu número y usa nuestra API desde Apps Script, Python o Java. Gratis durante la beta.</p>
-    <div class="hero-actions">
-      <button class="btn-primary" onclick="openLogin()">
-        Comenzar gratis →
-      </button>
-      <button class="btn-secondary" onclick="openTerms()">
-        Términos y condiciones
-      </button>
-    </div>
+    <span>+100 negocios ya automatizan con MiBot</span>
   </div>
 </section>
 
-<!-- PRICING NOTICE -->
-<div class="pricing-notice">
-  <div class="pricing-card">
-    <div class="pricing-icon">🎁</div>
-    <div class="pricing-text">
-      <h3>Servicio Beta — Actualmente Gratuito</h3>
-      <p>MiBot está en fase beta y es completamente gratuito hasta el <strong>6 de mayo de 2026</strong>. A partir de esa fecha el servicio tendrá un costo mensual. Los usuarios registrados durante la beta recibirán condiciones especiales.</p>
-    </div>
+<div class="logos-section">
+  <p>Integra con tus herramientas favoritas</p>
+  <div class="logos-row">
+    <div class="logo-item">📊 Google Sheets</div>
+    <div class="logo-item">⚙️ Apps Script</div>
+    <div class="logo-item">🐍 Python</div>
+    <div class="logo-item">☕ Java</div>
+    <div class="logo-item">🔗 REST API</div>
+    <div class="logo-item">📋 CSV / Excel</div>
   </div>
 </div>
 
-<!-- FEATURES -->
-<section class="features" id="features">
-  <div class="section-label">Funcionalidades</div>
-  <h2 class="section-title">Todo lo que necesitas</h2>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">📅</div>
-      <h3>Mensajes programados</h3>
-      <p>Agenda mensajes para cualquier hora y fecha. El bot los envía automáticamente en hora Ciudad de México.</p>
+<section id="como-funciona">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Cómo funciona</div>
+      <h2 class="section-title">En 3 pasos estás enviando</h2>
+      <p class="section-sub">Sin configuraciones complicadas. Sin la API oficial de Meta.</p>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔌</div>
-      <h3>API REST</h3>
-      <p>Integra con Apps Script, Python, Java, n8n o cualquier herramienta que pueda hacer peticiones HTTP.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📱</div>
-      <h3>Tu propio número</h3>
-      <p>Conectas tu número de WhatsApp mediante QR. Los mensajes salen desde tu cuenta personal.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
-      <h3>Panel de control</h3>
-      <p>Visualiza tus mensajes pendientes, cancélalos o envíalos de inmediato desde el dashboard.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">⚡</div>
-      <h3>Webhooks</h3>
-      <p>Conecta triggers externos: formularios, pagos, alertas. Envía mensajes automáticos cuando ocurra un evento.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🛡️</div>
-      <h3>Protección anti-ban</h3>
-      <p>Retraso automático de 6 segundos entre mensajes para reducir el riesgo de bloqueo por parte de WhatsApp.</p>
+    <div class="steps reveal">
+      <div class="step-card"><div class="step-num">1</div><h3>Crea tu cuenta</h3><p>Regístrate con tu email y contraseña. Sin tarjeta de crédito para empezar. Acceso inmediato al panel.</p></div>
+      <div class="step-card"><div class="step-num">2</div><h3>Conecta tu WhatsApp</h3><p>Escanea el código QR desde el panel con tu WhatsApp. El proceso toma menos de 30 segundos.</p></div>
+      <div class="step-card"><div class="step-num">3</div><h3>Automatiza y programa</h3><p>Usa el panel web, importa desde Google Sheets o conecta la API REST desde tu código favorito.</p></div>
     </div>
   </div>
 </section>
 
-<!-- WARNINGS -->
-<section class="warnings" id="warnings">
-  <div class="section-label">Advertencias importantes</div>
-  <h2 class="section-title">Lee antes de continuar</h2>
-
-  <div class="warning-card">
-    <div class="warning-icon">⚠️</div>
-    <div>
-      <h4>Riesgo de bloqueo de cuenta</h4>
-      <p>El uso de automatizaciones en WhatsApp puede violar los Términos de Servicio de Meta/WhatsApp y resultar en la suspensión o baneo permanente de tu número. MiBot no tiene afiliación con Meta ni con WhatsApp Inc.</p>
+<section id="funciones" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Funciones</div>
+      <h2 class="section-title">Todo lo que necesitas</h2>
+      <p class="section-sub">Desde envíos programados hasta importación masiva desde tus hojas de cálculo.</p>
     </div>
-  </div>
-
-  <div class="warning-card">
-    <div class="warning-icon">🚫</div>
-    <div>
-      <h4>Servicio bajo tu propio riesgo</h4>
-      <p>Este servicio se proporciona "tal cual". No nos hacemos responsables por pérdida de cuenta, datos, ingresos o cualquier daño derivado del uso de MiBot. El usuario asume toda la responsabilidad.</p>
-    </div>
-  </div>
-
-  <div class="warning-card">
-    <div class="warning-icon">📨</div>
-    <div>
-      <h4>Prohibido el spam</h4>
-      <p>Queda estrictamente prohibido usar MiBot para enviar mensajes no solicitados (spam), publicidad masiva no autorizada o cualquier contenido que viole las leyes aplicables. El abuso resulta en la cancelación inmediata del acceso.</p>
-    </div>
-  </div>
-
-  <div class="warning-card">
-    <div class="warning-icon">🔒</div>
-    <div>
-      <h4>Sin almacenamiento de mensajes</h4>
-      <p>MiBot es un servicio stateless. No almacenamos el contenido de tus conversaciones de forma permanente. Los mensajes programados se eliminan automáticamente tras 30 días.</p>
+    <div class="features-grid reveal">
+      <div class="feature-card"><div class="feature-icon">📅</div><h3>Mensajes programados</h3><p>Define fecha y hora exacta para cada mensaje. El sistema los envía automáticamente, incluso cuando no estás conectado.</p></div>
+      <div class="feature-card"><div class="feature-icon">📋</div><h3>Importación masiva</h3><p>Pega directamente desde Google Sheets o sube un CSV. Formato simple: número, mensaje, fecha.</p></div>
+      <div class="feature-card"><div class="feature-icon">🔌</div><h3>API REST completa</h3><p>Integra desde cualquier lenguaje. Ejemplos listos para Apps Script, Python, Java y cURL incluidos en el panel.</p></div>
+      <div class="feature-card"><div class="feature-icon">📜</div><h3>Historial de envíos</h3><p>Consulta los últimos 90 días de mensajes enviados. Reenvía al mismo contacto con un solo clic.</p></div>
+      <div class="feature-card"><div class="feature-icon">✏️</div><h3>Editar antes de enviar</h3><p>Edita el número, el mensaje o la fecha de cualquier mensaje pendiente antes de que se envíe.</p></div>
+      <div class="feature-card"><div class="feature-icon">📱</div><h3>Panel mobile-first</h3><p>Diseñado para funcionar perfecto en celular y computadora. Gestiona tus mensajes desde donde estés.</p></div>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
+<section class="code-section">
+  <div class="container">
+    <div class="code-grid">
+      <div class="reveal">
+        <div class="section-label">Para desarrolladores</div>
+        <h2 class="section-title">API REST lista para usar</h2>
+        <p class="section-sub" style="margin-bottom:24px">Integra MiBot en minutos desde cualquier lenguaje.</p>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:12px">
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)"><span style="color:var(--green)">✓</span> Autenticación por header x-api-key</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)"><span style="color:var(--green)">✓</span> Respuestas JSON estándar</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)"><span style="color:var(--green)">✓</span> Envío inmediato y programado</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)"><span style="color:var(--green)">✓</span> Documentación completa en el panel</li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dot" style="background:#ff5f57"></div>
+            <div class="code-dot" style="background:#febc2e"></div>
+            <div class="code-dot" style="background:#28c840"></div>
+            <div class="code-tabs">
+              <button class="code-tab active" onclick="showCode('apps',this)">Apps Script</button>
+              <button class="code-tab" onclick="showCode('python',this)">Python</button>
+            </div>
+          </div>
+          <pre class="code" id="code-apps">
+<span class="cm">// Apps Script — enviar WA desde Sheets</span>
+<span class="kw">const</span> <span class="nm">KEY</span> = PropertiesService
+  .getScriptProperties()
+  .getProperty(<span class="st">"MIBOT_KEY"</span>)
+
+<span class="kw">function</span> <span class="fn">enviarWhatsApp</span>(numero, mensaje) {
+  <span class="kw">return</span> JSON.<span class="fn">parse</span>(
+    UrlFetchApp.<span class="fn">fetch</span>(
+      <span class="st">"https://api.mibot.mx/api/send"</span>, {
+        method: <span class="st">"post"</span>,
+        headers: { <span class="st">"x-api-key"</span>: KEY },
+        payload: JSON.<span class="fn">stringify</span>({
+          to: numero, message: mensaje
+        })
+    }).<span class="fn">getContentText</span>()
+  )
+}</pre>
+          <pre class="code" id="code-python" style="display:none">
+<span class="cm"># Python — programar mensajes de WhatsApp</span>
+<span class="kw">import</span> requests, os
+
+URL = <span class="st">"https://api.mibot.mx"</span>
+KEY = os.environ[<span class="st">"MIBOT_KEY"</span>]
+H = {<span class="st">"x-api-key"</span>: KEY}
+
+<span class="kw">def</span> <span class="fn">programar</span>(numero, mensaje, fecha):
+    <span class="cm"># fecha: "2026-05-01T09:00" hora CDMX</span>
+    <span class="kw">return</span> requests.<span class="fn">post</span>(
+        f<span class="st">"{URL}/api/schedule"</span>,
+        headers=H,
+        json={
+          <span class="st">"to"</span>: numero,
+          <span class="st">"message"</span>: mensaje,
+          <span class="st">"sendAt"</span>: fecha
+        }
+    ).<span class="fn">json</span>()</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="precios">
+  <div class="container" style="text-align:center">
+    <div class="reveal">
+      <div class="section-label">Precios</div>
+      <h2 class="section-title">Simple y transparente</h2>
+      <p class="section-sub" style="margin:0 auto">Sin costos ocultos. Sin contratos. Cancela cuando quieras.</p>
+    </div>
+    <div class="pricing-grid reveal">
+      <div class="pricing-card">
+        <div class="pricing-name">Básico</div>
+        <div class="pricing-price"><sup>$</sup>1<sub>/mes</sub></div>
+        <p class="pricing-desc">Ideal para emprendedores y uso personal</p>
+        <ul class="pricing-features">
+          <li>50 mensajes por mes</li>
+          <li>1 número de WhatsApp</li>
+          <li>Panel web completo</li>
+          <li>API REST incluida</li>
+          <li>Programación de mensajes</li>
+          <li class="dim">Importación masiva CSV</li>
+          <li class="dim">Historial 90 días</li>
+        </ul>
+        <button class="btn-plan-basic" onclick="openModal('register')">Comenzar con Básico</button>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-badge">MÁS POPULAR</div>
+        <div class="pricing-name">Pro</div>
+        <div class="pricing-price"><sup>$</sup>5<sub>/mes</sub></div>
+        <p class="pricing-desc">Para negocios y equipos que escalan</p>
+        <ul class="pricing-features">
+          <li>Mensajes ilimitados</li>
+          <li>1 número de WhatsApp</li>
+          <li>Panel web completo</li>
+          <li>API REST incluida</li>
+          <li>Programación de mensajes</li>
+          <li>Importación masiva CSV / Sheets</li>
+          <li>Historial 90 días</li>
+        </ul>
+        <button class="btn-plan-pro" onclick="openModal('register')">Comenzar con Pro</button>
+      </div>
+    </div>
+    <p class="pricing-note reveal">💳 Pago seguro con Stripe · Cancela en cualquier momento · Sin permanencia</p>
+  </div>
+</section>
+
+<section id="faq" style="background:var(--surface);border-top:1px solid var(--border)">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">FAQ</div>
+      <h2 class="section-title">Preguntas frecuentes</h2>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Necesito la API oficial de WhatsApp Business?<span class="faq-icon">+</span></div><div class="faq-a">No. MiBot funciona con tu número de WhatsApp normal. Solo escaneas un código QR desde el panel y en menos de 30 segundos estás conectado.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Puedo integrar MiBot con Google Sheets?<span class="faq-icon">+</span></div><div class="faq-a">Sí. El panel incluye código listo para copiar y pegar en Google Apps Script. También puedes importar mensajes masivamente pegando directamente desde tu hoja de cálculo.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Funciona en toda Latinoamérica?<span class="faq-icon">+</span></div><div class="faq-a">Sí. MiBot funciona con cualquier número de WhatsApp de cualquier país: México, Colombia, Argentina, Chile, Perú, Venezuela y más.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Qué pasa si mi cuenta de WhatsApp es baneada?<span class="faq-icon">+</span></div><div class="faq-a">El uso de automatizaciones puede violar los Términos de Servicio de WhatsApp. Recomendamos usarlo con moderación y solo enviar mensajes a personas que dieron su consentimiento. MiBot no se hace responsable por suspensiones.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Los mensajes se envían aunque cierre el panel?<span class="faq-icon">+</span></div><div class="faq-a">Sí. El servidor funciona 24/7 en la nube. Una vez que programas un mensaje, se envía automáticamente a la hora indicada sin que tengas que hacer nada más.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Puedo cancelar en cualquier momento?<span class="faq-icon">+</span></div><div class="faq-a">Sí. Cancela cuando quieras desde el portal de Stripe. Sin contratos ni permanencias. Mantienes acceso hasta el final del período pagado.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container">
+    <h2 class="reveal">¿Listo para automatizar<br>tu WhatsApp?</h2>
+    <p class="reveal">Únete a cientos de negocios en Latinoamérica que ya usan MiBot.</p>
+    <div class="reveal"><a href="#" class="btn-primary" onclick="openModal('register')" style="font-size:17px;padding:17px 40px">Crear cuenta gratis →</a></div>
+  </div>
+</section>
+
 <footer>
-  <div class="footer-logo">MiBot WA</div>
-  <p>Servicio Beta — Gratuito hasta el 6 de mayo de 2026</p>
-  <p><a href="#" onclick="openTerms()">Términos y condiciones</a> · <a href="mailto:contacto@mibot.app">Contacto</a></p>
+  <a href="/" class="footer-logo">MiBot <span>WA</span></a>
+  <ul class="footer-links">
+    <li><a href="#como-funciona">Cómo funciona</a></li>
+    <li><a href="#precios">Precios</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#" onclick="openTerms()">Términos</a></li>
+  </ul>
+  <span class="footer-copy">© 2026 MiBot WA</span>
 </footer>
 
-<!-- LOGIN MODAL -->
-<div class="modal-overlay" id="loginModal" onclick="if(event.target===this)closeLogin()">
+<!-- Auth Modal -->
+<div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
-    <button class="modal-close" onclick="closeLogin()">✕</button>
-    <div class="modal-logo">MiBot WA</div>
-
-    <!-- Tabs -->
-    <div style="display:flex;gap:0;margin-bottom:24px;background:#f0f2f5;padding:4px;border-radius:10px">
-      <button id="tab-login-btn" onclick="switchTab('login')" style="flex:1;padding:8px;border:none;background:white;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;color:#1a1a2e;box-shadow:0 1px 4px rgba(0,0,0,.08);font-family:inherit">Iniciar sesión</button>
-      <button id="tab-reg-btn" onclick="switchTab('register')" style="flex:1;padding:8px;border:none;background:transparent;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;color:#666;font-family:inherit">Registrarse</button>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-logo">MiBot <span>WA</span></div>
+    <p class="modal-sub" id="modalSub">Automatiza tu WhatsApp hoy</p>
+    <div class="form-tabs">
+      <button class="form-tab" id="tab-login" onclick="switchTab('login')">Iniciar sesión</button>
+      <button class="form-tab" id="tab-register" onclick="switchTab('register')">Registrarse</button>
     </div>
-
-    <div id="authError" class="login-error"></div>
-    <div id="authSuccess" style="background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;padding:10px 14px;font-size:13px;color:#25d366;margin-bottom:16px;display:none"></div>
-
-    <!-- Login form -->
-    <div id="form-login">
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="email"/>
-      </div>
-      <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" id="loginPassword" placeholder="Tu contraseña" onkeypress="if(event.key==='Enter')doLogin()"/>
-      </div>
-      <button class="btn-login" onclick="doLogin()">Iniciar sesión →</button>
-      <div class="login-note">¿No tienes cuenta? <a href="#" onclick="switchTab('register')" style="color:var(--green)">Regístrate gratis</a></div>
+    <div class="form-error" id="formError"></div>
+    <div id="formLogin">
+      <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" class="form-input" placeholder="tu@email.com" autocomplete="email"/></div>
+      <div class="form-group"><label class="form-label">Contraseña</label><input type="password" id="loginPass" class="form-input" placeholder="Tu contraseña" onkeypress="if(event.key==='Enter')doLogin()"/></div>
+      <button class="form-btn" onclick="doLogin()" id="btnLogin">Iniciar sesión →</button>
+      <p class="form-note">¿No tienes cuenta? <a href="#" onclick="switchTab('register')">Regístrate gratis</a></p>
     </div>
-
-    <!-- Register form -->
-    <div id="form-register" style="display:none">
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="regEmail" placeholder="tu@email.com" autocomplete="email"/>
-      </div>
-      <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres"/>
-      </div>
-      <div class="form-group">
-        <label>Confirmar contraseña</label>
-        <input type="password" id="regPassword2" placeholder="Repite tu contraseña" onkeypress="if(event.key==='Enter')doRegister()"/>
-      </div>
-      <div class="terms-check">
-        <input type="checkbox" id="termsCheck"/>
-        <label for="termsCheck">
-          He leído y acepto los <a href="#" onclick="openTerms()">Términos y Condiciones</a>.
-          Entiendo que es un servicio beta bajo mi propio riesgo.
-        </label>
-      </div>
-      <button class="btn-login" onclick="doRegister()">Crear cuenta →</button>
-      <div class="login-note">¿Ya tienes cuenta? <a href="#" onclick="switchTab('login')" style="color:var(--green)">Inicia sesión</a></div>
+    <div id="formRegister" style="display:none">
+      <div class="form-group"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-input" placeholder="tu@email.com" autocomplete="email"/></div>
+      <div class="form-group"><label class="form-label">Contraseña</label><input type="password" id="regPass" class="form-input" placeholder="Mínimo 6 caracteres"/></div>
+      <div class="form-group"><label class="form-label">Confirmar contraseña</label><input type="password" id="regPass2" class="form-input" placeholder="Repite tu contraseña" onkeypress="if(event.key==='Enter')doRegister()"/></div>
+      <div class="terms-row"><input type="checkbox" id="termsCheck"/><label for="termsCheck">Acepto los <a href="#" onclick="openTerms()">Términos y Condiciones</a>. Entiendo que es un servicio beta bajo mi propio riesgo.</label></div>
+      <button class="form-btn" onclick="doRegister()" id="btnRegister">Crear cuenta →</button>
+      <p class="form-note">¿Ya tienes cuenta? <a href="#" onclick="switchTab('login')">Inicia sesión</a></p>
     </div>
-
   </div>
 </div>
 
-<!-- TERMS PAGE -->
+<!-- Terms -->
 <div class="terms-page" id="termsPage">
-  <div class="terms-container">
+  <div class="terms-inner">
     <button class="terms-back" onclick="closeTerms()">← Volver</button>
-    <div class="terms-header">
-      <h1>Términos y Condiciones</h1>
-      <p>Última actualización: 31 de marzo de 2026 · MiBot WhatsApp Automation</p>
-    </div>
-    <div class="terms-lang-toggle">
-      <button class="lang-btn active" onclick="setLang('es', this)">Español</button>
-      <button class="lang-btn" onclick="setLang('en', this)">English</button>
-    </div>
-    <div class="terms-content active" id="terms-es">
-      <div class="terms-warning-box"><p>⚠️ <strong>ADVERTENCIA:</strong> Este servicio NO está afiliado con WhatsApp Inc. ni con Meta Platforms Inc. El uso de automatizaciones puede violar los Términos de Servicio de WhatsApp. El usuario asume toda la responsabilidad.</p></div>
-      <div class="terms-section"><h2>1. Naturaleza del Servicio</h2><p>MiBot es un servicio de automatización de mensajería independiente, sin relación con WhatsApp Inc. o Meta Platforms Inc.</p><div class="terms-info-box"><p>🎁 <strong>Beta Gratuita:</strong> Gratuito hasta el <strong>6 de mayo de 2026</strong>. Después tendrá costo mensual.</p></div></div>
-      <div class="terms-section"><h2>2. Riesgos y Responsabilidad</h2><ul><li>El uso puede resultar en <strong>suspensión temporal o permanente</strong> de tu número de WhatsApp.</li><li>MiBot no se responsabiliza por banes, suspensiones o pérdida de cuenta.</li><li>El usuario es responsable del contenido de los mensajes enviados.</li><li>Se requiere consentimiento de los destinatarios conforme a leyes de privacidad aplicables.</li></ul></div>
-      <div class="terms-section"><h2>3. Uso Prohibido</h2><ul><li>Spam o mensajes no solicitados a escala.</li><li>Contenido ilegal, ofensivo o fraudulento.</li><li>Marketing masivo sin consentimiento expreso.</li><li>Actividades que violen leyes locales o internacionales.</li></ul><div class="terms-warning-box"><p>⛔ El incumplimiento resulta en <strong>cancelación inmediata</strong> del acceso.</p></div></div>
-      <div class="terms-section"><h2>4. Exención de Responsabilidad</h2><p>MiBot se proporciona "tal cual". No garantizamos disponibilidad continua ni entrega exitosa de mensajes. No somos responsables por daños directos, indirectos o consecuentes.</p></div>
-      <div class="terms-section"><h2>5. Privacidad</h2><ul><li>No vendemos datos de usuarios.</li><li>Los mensajes programados se eliminan tras 30 días.</li><li>Las contraseñas se almacenan con hash, nunca en texto plano.</li></ul></div>
-      <div class="terms-section"><h2>6. Jurisdicción</h2><p>Estos términos se rigen por las leyes de los Estados Unidos Mexicanos. Disputas ante tribunales de la Ciudad de México.</p></div>
-      <div class="terms-info-box"><p>✅ Al registrarte, confirmas haber leído y aceptado estos Términos en su totalidad.</p></div>
-    </div>
-    <div class="terms-content" id="terms-en">
-      <div class="terms-warning-box"><p>⚠️ <strong>WARNING:</strong> This service is NOT affiliated with WhatsApp Inc. or Meta Platforms Inc. Automation tools may violate WhatsApp's Terms of Service. The user assumes all responsibility.</p></div>
-      <div class="terms-section"><h2>1. Nature of Service</h2><p>MiBot is an independent messaging automation service with no relation to WhatsApp Inc. or Meta Platforms Inc.</p><div class="terms-info-box"><p>🎁 <strong>Free Beta:</strong> Free until <strong>May 6, 2026</strong>. Monthly cost starts after that date.</p></div></div>
-      <div class="terms-section"><h2>2. User Risks and Responsibility</h2><ul><li>Use may result in <strong>temporary or permanent suspension</strong> of your WhatsApp number.</li><li>MiBot is not liable for bans, suspensions, or account loss.</li><li>Users are solely responsible for message content.</li><li>Recipients' consent is required per applicable privacy laws.</li></ul></div>
-      <div class="terms-section"><h2>3. Prohibited Use</h2><ul><li>Unsolicited messages (spam) at scale.</li><li>Illegal, offensive, or fraudulent content.</li><li>Mass marketing without express consent.</li><li>Activities violating local or international laws.</li></ul><div class="terms-warning-box"><p>⛔ Violations result in <strong>immediate cancellation</strong> of access.</p></div></div>
-      <div class="terms-section"><h2>4. Disclaimer</h2><p>MiBot is provided "as-is". We do not guarantee continuous availability or successful message delivery. We are not liable for any damages.</p></div>
-      <div class="terms-section"><h2>5. Privacy</h2><ul><li>We do not sell user data.</li><li>Scheduled messages are deleted after 30 days.</li><li>Passwords are hashed and never stored in plain text.</li></ul></div>
-      <div class="terms-section"><h2>6. Jurisdiction</h2><p>These terms are governed by Mexican law. Disputes before courts of Mexico City.</p></div>
-      <div class="terms-info-box"><p>✅ By registering, you confirm you have read and accepted these Terms in full.</p></div>
-    </div>
+    <h1>Términos y Condiciones</h1>
+    <p class="terms-meta">Última actualización: 1 de abril de 2026 · MiBot WA</p>
+    <div class="terms-warn">⚠️ <strong>ADVERTENCIA:</strong> Este servicio NO está afiliado con WhatsApp Inc. ni con Meta Platforms Inc. El uso de automatizaciones puede violar los Términos de Servicio de WhatsApp. El usuario asume toda la responsabilidad.</div>
+    <h2>1. Naturaleza del servicio</h2><p>MiBot WA es un servicio independiente. No está afiliado con WhatsApp Inc. o Meta Platforms Inc.</p>
+    <h2>2. Riesgos</h2><ul><li>El uso puede resultar en suspensión de tu número de WhatsApp.</li><li>MiBot no se responsabiliza por banes o pérdida de cuenta.</li><li>El usuario es responsable del contenido de los mensajes.</li></ul>
+    <h2>3. Uso prohibido</h2><ul><li>Spam o mensajes no solicitados masivos.</li><li>Contenido ilegal, ofensivo o fraudulento.</li><li>Marketing sin consentimiento expreso de los destinatarios.</li></ul>
+    <h2>4. Precios y facturación</h2><p>Los precios se cobran mensualmente vía Stripe. Puedes cancelar en cualquier momento. Mantienes acceso hasta el final del período pagado.</p>
+    <h2>5. Privacidad</h2><ul><li>No vendemos datos de usuarios.</li><li>Las contraseñas se almacenan de forma segura.</li></ul>
+    <h2>6. Exención de responsabilidad</h2><p>MiBot WA se proporciona "tal cual". No garantizamos disponibilidad continua ni entrega exitosa de mensajes.</p>
+    <h2>7. Jurisdicción</h2><p>Estos términos se rigen por las leyes de México. Disputas ante tribunales de la Ciudad de México.</p>
   </div>
 </div>
 
 <script>
-const BACKEND = 'https://whatsapp-production-0e14.up.railway.app'
+const BACKEND='https://whatsapp-production-0e14.up.railway.app'
 
-// Mostrar error si viene de Railway redirect
-window.addEventListener('load', () => {
-  const params = new URLSearchParams(window.location.search)
-  const error = params.get('error')
-  if (error) {
-    openLogin()
-    const msgs = {
-      'missing': 'Email y contraseña requeridos.',
-      'password_short': 'La contraseña debe tener al menos 6 caracteres.',
-      'conexion': 'Error de conexión. Intenta de nuevo.',
-    }
-    setTimeout(() => showError(msgs[error] || decodeURIComponent(error)), 400)
-    window.history.replaceState({}, '', window.location.pathname)
+function openModal(tab){document.getElementById('authModal').classList.add('open');document.body.style.overflow='hidden';switchTab(tab||'register');clearError()}
+function closeModal(){document.getElementById('authModal').classList.remove('open');document.body.style.overflow='';clearError()}
+function switchTab(tab){
+  document.getElementById('formLogin').style.display=tab==='login'?'block':'none'
+  document.getElementById('formRegister').style.display=tab==='register'?'block':'none'
+  document.getElementById('tab-login').classList.toggle('active',tab==='login')
+  document.getElementById('tab-register').classList.toggle('active',tab==='register')
+  document.getElementById('modalSub').textContent=tab==='login'?'Bienvenido de nuevo':'Automatiza tu WhatsApp hoy'
+  clearError()
+}
+function showError(msg){const el=document.getElementById('formError');el.textContent=msg;el.style.display='block'}
+function clearError(){const el=document.getElementById('formError');el.style.display='none';el.textContent=''}
+
+function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim()
+  const password=document.getElementById('loginPass').value
+  if(!email||!password){showError('Ingresa tu email y contraseña.');return}
+  const btn=document.getElementById('btnLogin')
+  btn.disabled=true;btn.textContent='Verificando...'
+  const form=document.createElement('form')
+  form.method='POST';form.action=BACKEND+'/auth/login-redirect';form.style.display='none'
+  const fe=document.createElement('input');fe.name='email';fe.value=email
+  const fp=document.createElement('input');fp.name='password';fp.value=password
+  form.appendChild(fe);form.appendChild(fp);document.body.appendChild(form);form.submit()
+}
+
+function doRegister(){
+  const email=document.getElementById('regEmail').value.trim()
+  const pass1=document.getElementById('regPass').value
+  const pass2=document.getElementById('regPass2').value
+  const terms=document.getElementById('termsCheck').checked
+  if(!email||!pass1){showError('Completa todos los campos.');return}
+  if(pass1.length<6){showError('La contraseña debe tener al menos 6 caracteres.');return}
+  if(pass1!==pass2){showError('Las contraseñas no coinciden.');return}
+  if(!terms){showError('Debes aceptar los Términos y Condiciones.');return}
+  const btn=document.getElementById('btnRegister')
+  btn.disabled=true;btn.textContent='Creando cuenta...'
+  const form=document.createElement('form')
+  form.method='POST';form.action=BACKEND+'/auth/register-redirect';form.style.display='none'
+  const fe=document.createElement('input');fe.name='email';fe.value=email
+  const fp=document.createElement('input');fp.name='password';fp.value=pass1
+  form.appendChild(fe);form.appendChild(fp);document.body.appendChild(form);form.submit()
+}
+
+window.addEventListener('load',()=>{
+  const params=new URLSearchParams(window.location.search)
+  const error=params.get('error')
+  if(error){
+    openModal('login')
+    const msgs={missing:'Email y contraseña requeridos.',conexion:'Error de conexión. Intenta de nuevo.'}
+    setTimeout(()=>showError(msgs[error]||decodeURIComponent(error)),400)
+    history.replaceState({},'',window.location.pathname)
   }
 })
 
-function openLogin () {
-  document.getElementById('loginModal').classList.add('open')
-  document.body.style.overflow = 'hidden'
-  setTimeout(() => document.getElementById('loginEmail').focus(), 300)
-}
+function openTerms(){document.getElementById('termsPage').classList.add('open');document.body.style.overflow='hidden'}
+function closeTerms(){document.getElementById('termsPage').classList.remove('open');document.body.style.overflow=''}
 
-function closeLogin () {
-  document.getElementById('loginModal').classList.remove('open')
-  document.body.style.overflow = ''
-  document.getElementById('authError').style.display = 'none'
-  document.getElementById('authSuccess').style.display = 'none'
-}
-
-function switchTab (tab) {
-  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none'
-  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none'
-  document.getElementById('tab-login-btn').style.background = tab === 'login' ? 'white' : 'transparent'
-  document.getElementById('tab-login-btn').style.color = tab === 'login' ? '#1a1a2e' : '#666'
-  document.getElementById('tab-login-btn').style.boxShadow = tab === 'login' ? '0 1px 4px rgba(0,0,0,.08)' : 'none'
-  document.getElementById('tab-reg-btn').style.background = tab === 'register' ? 'white' : 'transparent'
-  document.getElementById('tab-reg-btn').style.color = tab === 'register' ? '#1a1a2e' : '#666'
-  document.getElementById('tab-reg-btn').style.boxShadow = tab === 'register' ? '0 1px 4px rgba(0,0,0,.08)' : 'none'
-  document.getElementById('authError').style.display = 'none'
-  document.getElementById('authSuccess').style.display = 'none'
-}
-
-function showError (msg) {
-  const el = document.getElementById('authError')
-  el.textContent = msg; el.style.display = 'block'
-}
-
-function showSuccess (msg) {
-  const el = document.getElementById('authSuccess')
-  el.textContent = msg; el.style.display = 'block'
-  document.getElementById('authError').style.display = 'none'
-}
-
-async function doLogin () {
-  const email    = document.getElementById('loginEmail').value.trim()
-  const password = document.getElementById('loginPassword').value
-  if (!email || !password) { showError('Ingresa tu email y contraseña.'); return }
-
-  const btn = document.querySelector('#form-login .btn-login')
-  btn.disabled = true; btn.textContent = 'Redirigiendo...'
-
-  // Usar form POST para evitar problemas CORS con cookies
-  const form = document.createElement('form')
-  form.method = 'POST'
-  form.action = BACKEND + '/auth/login-redirect'
-  form.style.display = 'none'
-  const fe = document.createElement('input'); fe.name = 'email'; fe.value = email
-  const fp = document.createElement('input'); fp.name = 'password'; fp.value = password
-  form.appendChild(fe); form.appendChild(fp)
-  document.body.appendChild(form)
-  form.submit()
-}
-
-async function doRegister () {
-  const email = document.getElementById('regEmail').value.trim()
-  const pass1 = document.getElementById('regPassword').value
-  const pass2 = document.getElementById('regPassword2').value
-  const terms = document.getElementById('termsCheck').checked
-
-  if (!email || !pass1) { showError('Completa todos los campos.'); return }
-  if (pass1.length < 6) { showError('La contraseña debe tener al menos 6 caracteres.'); return }
-  if (pass1 !== pass2) { showError('Las contraseñas no coinciden.'); return }
-  if (!terms) { showError('Debes aceptar los Términos y Condiciones.'); return }
-
-  const btn = document.querySelector('#form-register .btn-login')
-  btn.disabled = true; btn.textContent = 'Creando cuenta...'
-
-  // Usar form POST para evitar problemas CORS con cookies
-  const form = document.createElement('form')
-  form.method = 'POST'
-  form.action = BACKEND + '/auth/register-redirect'
-  form.style.display = 'none'
-  const fe = document.createElement('input'); fe.name = 'email'; fe.value = email
-  const fp = document.createElement('input'); fp.name = 'password'; fp.value = pass1
-  form.appendChild(fe); form.appendChild(fp)
-  document.body.appendChild(form)
-  form.submit()
-}
-
-function openTerms () {
-  document.getElementById('termsPage').classList.add('open')
-  document.body.style.overflow = 'hidden'
-  document.getElementById('termsPage').scrollTop = 0
-}
-
-function closeTerms () {
-  document.getElementById('termsPage').classList.remove('open')
-  document.body.style.overflow = ''
-}
-
-function setLang (lang, btn) {
-  document.querySelectorAll('.terms-content').forEach(el => el.classList.remove('active'))
-  document.querySelectorAll('.lang-btn').forEach(el => el.classList.remove('active'))
-  document.getElementById('terms-' + lang).classList.add('active')
+function showCode(name,btn){
+  document.querySelectorAll('.code-tab').forEach(b=>b.classList.remove('active'))
   btn.classList.add('active')
+  document.getElementById('code-apps').style.display=name==='apps'?'block':'none'
+  document.getElementById('code-python').style.display=name==='python'?'block':'none'
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeLogin(); closeTerms() }
-})
+function toggleFaq(el){
+  const item=el.parentElement
+  const isOpen=item.classList.contains('open')
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'))
+  if(!isOpen)item.classList.add('open')
+}
+
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}})
+},{threshold:0.1})
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el))
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeTerms()}})
 </script>
 </body>
 </html>
